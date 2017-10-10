@@ -7,6 +7,15 @@
     android:background="@color/colorPrimary"
     tools:context="com.example.coolweather.WeatherActivity">
 
+    <!--centerCrop  将图像均匀地缩放(保持图像的宽比)，
+    因此图像的大小(宽度和高度)将等于或大于视图的相应维度(减去填充)。
+    然后图像以视图为中心。-->
+
+    <ImageView
+        android:id="@+id/bing_pic_img"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"/>
 
     <!--none 表示不显示滚动条-->
     <!--never 表示没有显示over-scroll效果。-->
@@ -17,10 +26,12 @@
         android:overScrollMode="never"
         android:scrollbars="none">
 
+        <!--fitsSystemWindows  为系统栏留出空间-->
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:fitsSystemWindows="true"
+            android:orientation="vertical">
 
             <!--显示城市名、更新时间-->
             <include layout="@layout/title"/>

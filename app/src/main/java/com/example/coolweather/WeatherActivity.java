@@ -1,6 +1,8 @@
 package com.example.coolweather;
 
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -8,11 +10,13 @@ import android.support.v7.widget.LinearLayoutCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.coolweather.gson.Forecast;
 import com.example.coolweather.gson.Weather;
 import com.example.coolweather.util.HttpUtil;
@@ -39,13 +43,27 @@ public class WeatherActivity extends AppCompatActivity {
     private TextView     mComfortText;
     private TextView     mCarWashText;
     private TextView     mSportText;
+    private ImageView    mBingPic;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // 让背景图片和状态栏融合在一起。Android 5.0 以上才支持，所以需要判断版本号。
+        // 天气界面的头布局和状态栏紧贴在一起，因为这时状态栏成为布局一部分，没有单独留空间。
+        if (Build.VERSION.SDK_INT >= 21) {
+            View decorView = getWindow().getDecorView();
+            decorView.setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+
+        }
         setContentView(R.layout.activity_weather);
 
+
         //初始化控件
+        mBingPic = (ImageView) findViewById(R.id.bing_pic_img);
         mWeatherLayout = (ScrollView) findViewById(R.id.weather_layout);
         mTitleCity = (TextView) findViewById(R.id.title_city);
         mTitleUpdateTime = (TextView) findViewById(R.id.title_update_time);
@@ -59,6 +77,15 @@ public class WeatherActivity extends AppCompatActivity {
         mSportText = (TextView) findViewById(R.id.sport_text);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String weatherString = prefs.getString("weather", null);
+        String bingPic = prefs.getString("bing_pic", null);
+
+        //如果有缓存，直接使用Glide来加载图片
+        if (bingPic != null) {
+            Glide.with(this).load(bingPic).into(mBingPic);
+        } else {
+            //没有缓存，调用这个方法去请求今日的必应背景图片
+            loadBingPic();
+        }
         if (weatherString != null) {
             //有缓存时，直接解析天气数据
             Weather weather = Utility.handleWeatherResponse(weatherString);
@@ -115,6 +142,9 @@ public class WeatherActivity extends AppCompatActivity {
 
             }
         });
+
+        //每次请求天气，同时刷新背景图片
+        loadBingPic();
     }
 
 
@@ -158,6 +188,35 @@ public class WeatherActivity extends AppCompatActivity {
         mCarWashText.setText(carWash);
         mSportText.setText(sport);
         mWeatherLayout.setVisibility(View.VISIBLE);
+
+    }
+
+    //加载必应每日一图
+    private void loadBingPic() {
+        String requestBingPic = "http://guolin.tech/api/bing_pic";
+        HttpUtil.sendOkHttpRequest(requestBingPic, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                final String bingPic = response.body().string();
+                SharedPreferences.Editor editor = PreferenceManager
+                        .getDefaultSharedPreferences(WeatherActivity.this)
+                        .edit();
+                editor.putString("bing_pic", bingPic);
+                editor.apply();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Glide.with(WeatherActivity.this).load(bingPic)
+                                .into(mBingPic);
+                    }
+                });
+            }
+        });
     }
 }
 
