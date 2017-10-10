@@ -17,41 +17,49 @@
         android:layout_height="match_parent"
         android:scaleType="centerCrop"/>
 
-    <!--none 表示不显示滚动条-->
-    <!--never 表示没有显示over-scroll效果。-->
-    <ScrollView
-        android:id="@+id/weather_layout"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:overScrollMode="never"
-        android:scrollbars="none">
+        android:layout_height="match_parent">
 
-        <!--fitsSystemWindows  为系统栏留出空间-->
-        <LinearLayout
+
+        <!--none 表示不显示滚动条-->
+        <!--never 表示没有显示over-scroll效果。-->
+        <ScrollView
+            android:id="@+id/weather_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fitsSystemWindows="true"
-            android:orientation="vertical">
+            android:layout_height="match_parent"
+            android:overScrollMode="never"
+            android:scrollbars="none">
 
-            <!--显示城市名、更新时间-->
-            <include layout="@layout/title"/>
+            <!--fitsSystemWindows  为系统栏留出空间-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fitsSystemWindows="true"
+                android:orientation="vertical">
 
-            <!--显示当前气温、天气概况-->
-            <include layout="@layout/now"/>
+                <!--显示城市名、更新时间-->
+                <include layout="@layout/title"/>
 
-            <!--显示预报，天气概况、当前最高温度、最低温度-->
-            <include layout="@layout/forecast"/>
+                <!--显示当前气温、天气概况-->
+                <include layout="@layout/now"/>
 
-            <!--显示空气质量-->
-            <include layout="@layout/api"/>
+                <!--显示预报，天气概况、当前最高温度、最低温度-->
+                <include layout="@layout/forecast"/>
 
-            <!--显示生活建议信息-->
-            <include layout="@layout/suggestion"/>
+                <!--显示空气质量-->
+                <include layout="@layout/api"/>
 
-        </LinearLayout>
+                <!--显示生活建议信息-->
+                <include layout="@layout/suggestion"/>
+
+            </LinearLayout>
 
 
-    </ScrollView>
+        </ScrollView>
 
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </FrameLayout>

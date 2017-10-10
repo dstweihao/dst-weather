@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutCompat;
@@ -32,18 +33,20 @@ import okhttp3.Response;
 
 public class WeatherActivity extends AppCompatActivity {
 
-    private ScrollView   mWeatherLayout;
-    private TextView     mTitleCity;
-    private TextView     mTitleUpdateTime;
-    private TextView     mDegreeText;
-    private TextView     mWeatherInfoText;
-    private LinearLayout mForecastLayout;
-    private TextView     mAqiText;
-    private TextView     mPm25Text;
-    private TextView     mComfortText;
-    private TextView     mCarWashText;
-    private TextView     mSportText;
-    private ImageView    mBingPic;
+    private ScrollView         mWeatherLayout;
+    private TextView           mTitleCity;
+    private TextView           mTitleUpdateTime;
+    private TextView           mDegreeText;
+    private TextView           mWeatherInfoText;
+    private LinearLayout       mForecastLayout;
+    private TextView           mAqiText;
+    private TextView           mPm25Text;
+    private TextView           mComfortText;
+    private TextView           mCarWashText;
+    private TextView           mSportText;
+    private ImageView          mBingPic;
+    private SwipeRefreshLayout mSwipeRefresh;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +66,11 @@ public class WeatherActivity extends AppCompatActivity {
 
 
         //初始化控件
+        mSwipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
+
+        //设置下拉刷新动画的颜色
+        mSwipeRefresh.setColorSchemeResources(R.color.colorPrimary);
+
         mBingPic = (ImageView) findViewById(R.id.bing_pic_img);
         mWeatherLayout = (ScrollView) findViewById(R.id.weather_layout);
         mTitleCity = (TextView) findViewById(R.id.title_city);
@@ -86,17 +94,28 @@ public class WeatherActivity extends AppCompatActivity {
             //没有缓存，调用这个方法去请求今日的必应背景图片
             loadBingPic();
         }
+
+
+        final String weatherId;
         if (weatherString != null) {
             //有缓存时，直接解析天气数据
             Weather weather = Utility.handleWeatherResponse(weatherString);
+            weatherId = weather.mBasic.weatherId;
             showWeatherInfo(weather);
         } else {
             //无缓存时，去服务器查询天气
-            String weatherId = getIntent().getStringExtra("weather_id");
+            weatherId = getIntent().getStringExtra("weather_id");
             mWeatherLayout.setVisibility(View.VISIBLE);
             Log.v("weather_id", weatherId);
             requestWeather(weatherId);
         }
+        //设置下拉刷新的监听器，触发下拉刷新，回调onRefresh()方法，请求天气信息
+        mSwipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                requestWeather(weatherId);
+            }
+        });
 
 
     }
@@ -126,6 +145,9 @@ public class WeatherActivity extends AppCompatActivity {
                         } else {
                             Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
                         }
+
+                        //请求结束，false表示刷新事件结束，并隐藏刷新进度条
+                        mSwipeRefresh.setRefreshing(false);
                     }
                 });
             }
@@ -137,8 +159,10 @@ public class WeatherActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
+                        mSwipeRefresh.setRefreshing(false);
                     }
                 });
+
 
             }
         });
