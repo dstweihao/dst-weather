@@ -16,12 +16,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        if (prefs.getString("weather", null) != null) {
+        String weather = prefs.getString("weather", null);
+        //启动，如果sp里面保存有weather,直接跳转到weatherActivity,将天气数据展示。
+        if (weather != null) {
             Intent intent = new Intent(this, WeatherActivity.class);
             startActivity(intent);
             finish();
         }
-
 
 
     }

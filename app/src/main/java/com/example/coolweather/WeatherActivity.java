@@ -4,13 +4,17 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -45,7 +49,10 @@ public class WeatherActivity extends AppCompatActivity {
     private TextView           mCarWashText;
     private TextView           mSportText;
     private ImageView          mBingPic;
-    private SwipeRefreshLayout mSwipeRefresh;
+    public SwipeRefreshLayout mSwipeRefresh;
+    private SharedPreferences  mPrefs;
+    private Button             mNavButton;
+    public DrawerLayout mDrawerLayout;
 
 
     @Override
@@ -66,12 +73,50 @@ public class WeatherActivity extends AppCompatActivity {
 
 
         //初始化控件
+        initView();
+
+        //查询天气
+        initWeather();
+
+        //加载必应图片
+        initBingPic();
+
+        //下拉刷新
+        initSwipeRefresh();
+
+        //左侧滑动菜单
+        initDrawerLayout();
+
+
+    }
+
+    private void initDrawerLayout() {
+
+        //点击导航键
+        mNavButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                // START-设置从左边滑出菜单  END 是右边。
+                mDrawerLayout.openDrawer(GravityCompat.START);
+            }
+        });
+    }
+
+    private void initView() {
+
+        //滑动菜单
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+        //导航键
+        mNavButton = (Button) findViewById(R.id.nav_button);
+
+
+        //下拉刷新
         mSwipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
-
-        //设置下拉刷新动画的颜色
-        mSwipeRefresh.setColorSchemeResources(R.color.colorPrimary);
-
+        //每日必应图片
         mBingPic = (ImageView) findViewById(R.id.bing_pic_img);
+
         mWeatherLayout = (ScrollView) findViewById(R.id.weather_layout);
         mTitleCity = (TextView) findViewById(R.id.title_city);
         mTitleUpdateTime = (TextView) findViewById(R.id.title_update_time);
@@ -83,19 +128,15 @@ public class WeatherActivity extends AppCompatActivity {
         mComfortText = (TextView) findViewById(R.id.comfort_text);
         mCarWashText = (TextView) findViewById(R.id.car_wash_text);
         mSportText = (TextView) findViewById(R.id.sport_text);
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String weatherString = prefs.getString("weather", null);
-        String bingPic = prefs.getString("bing_pic", null);
 
-        //如果有缓存，直接使用Glide来加载图片
-        if (bingPic != null) {
-            Glide.with(this).load(bingPic).into(mBingPic);
-        } else {
-            //没有缓存，调用这个方法去请求今日的必应背景图片
-            loadBingPic();
-        }
+    }
 
+    private void initWeather() {
+        // sp存储
+        mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String weatherString = mPrefs.getString("weather", null);
 
+        // final 修饰变量，变量变成常量，且只能被赋值一次。
         final String weatherId;
         if (weatherString != null) {
             //有缓存时，直接解析天气数据
@@ -120,9 +161,30 @@ public class WeatherActivity extends AppCompatActivity {
 
     }
 
+    private void initBingPic() {
+        String bingPic = mPrefs.getString("bing_pic", null);
+        //如果有缓存，直接使用Glide来加载图片
+        if (bingPic != null) {
+            Glide.with(this).load(bingPic).into(mBingPic);
+        } else {
+            //没有缓存，调用这个方法去请求今日的必应背景图片
+            loadBingPic();
+        }
+
+
+    }
+
+    private void initSwipeRefresh() {
+
+        //设置下拉刷新进度颜色
+        mSwipeRefresh.setColorSchemeResources(R.color.colorPrimary);
+
+
+    }
+
 
     //根据天气id请求城市天气信息
-    private void requestWeather(final String weatherId) {
+    public void requestWeather(final String weatherId) {
         String weatherUrl = "http://guolin.tech/api/weather?cityid=" +
                 weatherId + "&key=ed8660313886405a9de79a33d7b075c7";
         HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {

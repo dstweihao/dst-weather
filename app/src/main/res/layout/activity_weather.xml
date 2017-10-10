@@ -17,49 +17,67 @@
         android:layout_height="match_parent"
         android:scaleType="centerCrop"/>
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/swipe_refresh"
+
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawer_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
 
-        <!--none 表示不显示滚动条-->
-        <!--never 表示没有显示over-scroll效果。-->
-        <ScrollView
-            android:id="@+id/weather_layout"
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_refresh"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+            <!--none 表示不显示滚动条-->
+            <!--never 表示没有显示over-scroll效果。-->
+            <ScrollView
+                android:id="@+id/weather_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:overScrollMode="never"
+                android:scrollbars="none">
+
+                <!--fitsSystemWindows  为系统栏留出空间-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fitsSystemWindows="true"
+                    android:orientation="vertical">
+
+                    <!--显示城市名、更新时间-->
+                    <include layout="@layout/title"/>
+
+                    <!--显示当前气温、天气概况-->
+                    <include layout="@layout/now"/>
+
+                    <!--显示预报，天气概况、当前最高温度、最低温度-->
+                    <include layout="@layout/forecast"/>
+
+                    <!--显示空气质量-->
+                    <include layout="@layout/api"/>
+
+                    <!--显示生活建议信息-->
+                    <include layout="@layout/suggestion"/>
+
+                </LinearLayout>
+
+
+            </ScrollView>
+
+
+        </android.support.v4.widget.SwipeRefreshLayout>
+
+        <!--start 将对象推到容器的开头，而不是改变它的大小。-->
+        <fragment
+            android:id="@+id/choose_area_fragment"
+            android:name="com.example.coolweather.fragment.ChooseAreaFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:overScrollMode="never"
-            android:scrollbars="none">
-
-            <!--fitsSystemWindows  为系统栏留出空间-->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fitsSystemWindows="true"
-                android:orientation="vertical">
-
-                <!--显示城市名、更新时间-->
-                <include layout="@layout/title"/>
-
-                <!--显示当前气温、天气概况-->
-                <include layout="@layout/now"/>
-
-                <!--显示预报，天气概况、当前最高温度、最低温度-->
-                <include layout="@layout/forecast"/>
-
-                <!--显示空气质量-->
-                <include layout="@layout/api"/>
-
-                <!--显示生活建议信息-->
-                <include layout="@layout/suggestion"/>
-
-            </LinearLayout>
+            android:layout_gravity="start"/>
 
 
-        </ScrollView>
-
-
-    </android.support.v4.widget.SwipeRefreshLayout>
+    </android.support.v4.widget.DrawerLayout>
 
 </FrameLayout>

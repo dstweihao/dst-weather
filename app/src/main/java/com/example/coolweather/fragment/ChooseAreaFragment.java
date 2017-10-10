@@ -27,6 +27,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.coolweather.MainActivity;
 import com.example.coolweather.R;
 import com.example.coolweather.WeatherActivity;
 import com.example.coolweather.db.City;
@@ -104,10 +105,26 @@ public class ChooseAreaFragment extends Fragment {
 
                     Log.v("weather_id_choose", weatherId);
 
-                    Intent intent = new Intent(getActivity(), WeatherActivity.class);
-                    intent.putExtra("weather_id", weatherId);
-                    startActivity(intent);
-                    getActivity().finish();
+
+
+                    // instanceof关键字，用来判断一个对象是否属于某个类的实例。
+                    // 第一次启动时，是在MainActivity里面，然后选择完省市县和weatherId,将weatherId
+                    // 传给weatherActivity 去获取天气信息，并将其展示。
+                    if (getActivity() instanceof MainActivity) {
+                        Intent intent = new Intent(getActivity(), WeatherActivity.class);
+                        intent.putExtra("weather_id", weatherId);
+                        startActivity(intent);
+                        getActivity().finish();
+
+                     // 已经选择过天气信息，那么，sp里面
+                    } else if (getActivity() instanceof WeatherActivity) {
+                        WeatherActivity activity = (WeatherActivity) getActivity();
+                        activity.mDrawerLayout.closeDrawers();
+                        activity.mSwipeRefresh.setRefreshing(true);
+                        activity.requestWeather(weatherId);
+                    }
+
+
                 }
 
             }
