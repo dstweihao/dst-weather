@@ -116,11 +116,19 @@ public class ChooseAreaFragment extends Fragment {
                         startActivity(intent);
                         getActivity().finish();
 
-                     // 已经选择过天气信息，那么，sp里面
+
+                        /*
+
+                        如果在是在WeatherActivity里面，切换城市，选中城市之后，
+                        滑动菜单会自动关闭，并且主界面上的天气信息也会更新成你选中的那个城市。
+                       */
                     } else if (getActivity() instanceof WeatherActivity) {
                         WeatherActivity activity = (WeatherActivity) getActivity();
+                        //滑动菜单自动关闭
                         activity.mDrawerLayout.closeDrawers();
+                        //显示下拉刷新控件，刷新状态
                         activity.mSwipeRefresh.setRefreshing(true);
+                        //更新天气信息
                         activity.requestWeather(weatherId);
                     }
 
