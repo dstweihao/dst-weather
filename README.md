@@ -12,7 +12,13 @@ Weather是一款基于android端开发的天气预报app，有如下几个功能
 * 省市县的数据接口：<br>
   * 郭霖老师提供的接口(http://guolin.tech/api/china)
 * 托管代码：<br>
- * git
+  * git
+* 数据库：<br>
+  * LitePal
+* 网络请求：<br>
+  * OKHttp
+* 数据解析：<br>
+  * Gson
 
 
 
