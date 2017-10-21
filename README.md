@@ -11,6 +11,9 @@ Weather是一款基于android端开发的天气预报app，有如下几个功能
   * 彩云天气、和风天气
 * 省市县的数据接口：<br>
   * 郭霖老师提供的接口(http://guolin.tech/api/china)
+* 托管代码：<br>
+ * git
+
 
 
 
