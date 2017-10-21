@@ -26,6 +26,8 @@ Weather是一款基于android端开发的天气预报app，有如下几个功能
   * OKHttp
 * 数据解析：<br>
   * Gson
+* 发布应用：<br>
+  * 360应用商店
 
 
 
